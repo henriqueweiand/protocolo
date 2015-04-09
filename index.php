@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="framework/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="framework/bootstrap/css/bootstrap-theme.min.css">
 
-        <title>Protocolo</title>
+        <title>Protocolo testea</title>
     </head>
     <body>
 
