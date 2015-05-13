@@ -5,6 +5,18 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta property="og:title" content="Sistema de protocolo - CNEC Osório"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:site_name" content="Sistema de protocolo - CNEC Osório"/>
+        <meta name="robots" content="index, follow" />
+        <meta name="keywords" content="Faculdade Cenecista de Osório, CNEC, FACOS, cenecista, Universidade, Faculdade, Curso, Osório, RS, EAD, Informatica, licenciatura, educacao, aula, trabalho" />
+        <meta name="author" content="Henrique Weiand" />
+        <meta property="og:description" content="Sistema desenvolvido na disciplina de Redes, simulando um protocolo"/>
+        <meta name="title" content="Sistema protocolo" />
+        <meta name="description" content="Sistema desenvolvido na disciplina de Redes, simulando um protocolo" />
+        
+        <link type="image/x-icon" rel="icon" href="/favicon.ico">
+		<link type="image/x-icon" rel="shortcut icon" href="/favicon.ico" >
 
         <script src="framework/jquery-1.11.2.min.js"></script>
         <script src="framework/bootstrap/js/bootstrap.min.js"></script>
@@ -12,11 +24,11 @@
         <link rel="stylesheet" href="framework/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="framework/bootstrap/css/bootstrap-theme.min.css">
 
-        <title>Protocolo testea</title>
+        <title>Sistema Protocolo</title>
     </head>
     <body>
 
-        <form name="formProtocolo" id="formProtocolo" method="GET" action="montaProtocolo.php">
+        <form name="formProtocolo" id="formProtocolo" method="GET" action="montaProtocolo.php" onsubmit="return false;">
 
             <div class="container-fluid">
 
@@ -30,6 +42,8 @@
                         <!-- END .panel-headering -->
 
                         <div class="panel-body">
+                            
+                            <div class="col-md-12 result"></div>
                             
                             <div class="form-group col-md-6">
                                 <label for="">Endereço de origem</label>
@@ -77,17 +91,17 @@
                                                         $grupo = $data['grupo'];
                                                         echo '
                                                         <div class="list-group" style="margin-top:15px; margin-bottom:0px">
-                                                            <a href="#" class="list-group-item active">
-                                                                Arquivos da mensagem
-                                                            </a>
+                                                            <a class="list-group-item active">Arquivo da mensagem</a>
                                                         ';
                                                     }
                                                     
-                                                    echo '<a href="#" class="list-group-item">'.$data['nome'].'.'.$data['extensao'].'</a>';
+                                                    echo '
+                                                    <a class="list-group-item" target="_blank" href="/arquivos/'.$data['grupo'].'.'.$data['nome'].'.'.$data['extensao'].'">
+                                                        <span class="glyphicon glyphicon-download" aria-hidden="true" title="Baixar" data-toggle="tooltip" data-placement="top"></span>
+                                                        '.$data['nome'].'.'.$data['extensao'].'
+                                                    </a>';
                                                     
-                                                    if($data['grupo'] != @$grupo) {
-                                                        echo '</div>';
-                                                    }
+                                                    if($data['grupo'] != @$grupo) echo '</div>';
                                                     
                                                 }
                                                 // < Percorre os arquivos enviados
@@ -109,14 +123,10 @@
                         <!-- END .panel-body -->
 
                         <div class="panel-footer text-right">
-                            <button type="reset" class="btn btn-default">Resetar formulário</button>
-                            <button type="submit" class="btn btn-success" name="btnEnviar">Enviar</button>             
+                            <a href="/Trabalho T3 - 20151.pdf" target="_blank"><button type="button" class="btn btn-default">Baixar Enunciado</button></a>
+                            <button type="button" class="btn btn-success" name="btnEnviar">Enviar protocolo</button>
                         </div>
                         <!-- END .panel-footer -->
-                        
-                        <div class="col-md-12 result">
-                            
-                        </div>
 
                     </div>
                     <!-- END .panel -->
@@ -135,19 +145,34 @@
 <script type="text/javascript">
 jQuery(document).ready(function($) {
     
+    $('[data-toggle="tooltip"]').tooltip();
+  
+    $('[name=btnEnviar]').bind('click', function() {  
+        
+        var origem   = $('[name=origem]').val(),
+            destino  = $('[name=destino]').val(),
+            mensagem = $('[name=mensagem]').val(),
+            action   = $('[name=formProtocolo]').attr('action');
+        
+        $.ajax({
+            url    : action
+            ,type  : 'GET'
+            ,data  : { 'origem' : origem, 'destino' : destino, 'mensagem' : mensagem }
+            ,success: function(data) { $('.result').html(data); }
+        });
+    });
+    
     $('#tabs a').click(function (e) {
         divID = $(this).attr("href");
         
         if(divID == '#arquivo') {
-            $("#arquivo").find("input").prop("disabled", false);
-            $("#mensagem").find("input, textarea").prop("disabled", true);
-            $("button[name=btnEnviar]").text("Receber");
-            $("#formProtocolo").attr("action", "lerProtocolo.php");
+            $("#mensagem").find("textarea").prop("disabled", true);
+            $("[name=btnEnviar]").text("Receber arquivo");
+            $("[name=formProtocolo]").attr("action", "lerProtocolo.php");
         } else {
-            $("#arquivo").find("input").prop("disabled", true);
-            $("#mensagem").find("input, textarea").prop("disabled", false);
-            $("button[name=btnEnviar]").text("Enviar");
-            $("#formProtocolo").attr("action", "montaProtocolo.php");
+            $("#mensagem").find("textarea").prop("disabled", false);
+            $("[name=btnEnviar]").text("Enviar protocolo");
+            $("[name=formProtocolo]").attr("action", "montaProtocolo.php");
         }
         
         e.preventDefault()
