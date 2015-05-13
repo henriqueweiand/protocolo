@@ -28,8 +28,8 @@
 	if(!filter_var($destino, FILTER_VALIDATE_IP) !== false)
 		exit("O destino nao eh um IP valido.");
 	
-	$origem = str_replace(".", "", $origem);
-	$destino = str_replace(".", "", $destino);
+	$origem = array_reverse(explode(".",  $origem));
+	$destino = array_reverse(explode(".",  $destino));
 
 	$a_m = str_split($msg, 4096);
 	
@@ -38,8 +38,8 @@
 		$tm = dechex(strlen($a));
 		$sq = dechex($i+1);
 
-		$or = array_map("hexdec", array_reverse(str_split(dechex($origem), 2)));
-		$de = array_map("hexdec", array_reverse(str_split(dechex($destino), 2)));
+		$or = $origem;
+		$de = $destino;
 		
 		for($i=0;$i<5;$i++) {
 			
