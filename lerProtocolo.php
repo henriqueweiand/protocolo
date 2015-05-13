@@ -2,22 +2,22 @@
 	// < Inicializacao de variaveis
 	$filename = "/home/ubuntu/workspace/arquivos/1.protocolo.txt"; 		   // Arquivo do protocolo
 	$file 	  = fopen($filename, "rb"); 						   		   // Abre para leitura
-	$fread 	  = str_split(fread ($file, filesize ($filename)), (4096+26)); // Pega os 4096 bytes (Mensagem) + 26 bytes (Protocolo)  (retorna array)
+	$fread 	  = str_split(fread ($file, filesize ($filename)), (4096+26)); // Pega os 4096 bytes (Mensage) + 26 bytes (Protocolo)  (retorna array)
 	$msg 	  = "";
 	// > Inicializacao de variaveis
 	
-	// < Percorre
+	// < Percorre os arquivos do protocolo
 	foreach($fread as $i => $f) {
 		
 		$i 		 	= $i+1;
-		$chr_header = substr($f, 0, 16);
-		$chk_header = ord(substr($f, 16, 1));
-		$res_header = str_split($chr_header);
+		$chr_header = substr($f, 0, 16); /* pega os 16 bytes do cabeçalho */
+		$chk_header = ord(substr($f, 16, 1)); /* pega o checksum do cabeçalho */
+		$res_header = str_split($chr_header); /* quebra os 16 bytes em um array */
 		$chr_header = 0;
 		
-		foreach($res_header as $r) $chr_header ^= ord($r);
+		foreach($res_header as $r) $chr_header ^= ord($r); // quebra os 16 bytes em um array
 			
-		$chr_header = (~$chr_header) & 0xff;
+		$chr_header = (~$chr_header) & 0xff; /* inverso do valor */
 
 		// < Checagem do header
 		if($chr_header != $chk_header) {
