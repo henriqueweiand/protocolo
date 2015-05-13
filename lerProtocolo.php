@@ -2,7 +2,7 @@
 	// < Inicializacao de variaveis
 	$filename = "/home/ubuntu/workspace/arquivos/1.protocolo.txt"; 		   // Arquivo do protocolo
 	$file 	  = fopen($filename, "rb"); 						   		   // Abre para leitura
-	$fread 	  = str_split(fread ($file, filesize ($filename)), (4096+26)); // 
+	$fread 	  = str_split(fread ($file, filesize ($filename)), (4096+26)); // Pega os 4096 bytes (Mensagem) + 26 bytes (Protocolo)  (retorna array)
 	$msg 	  = "";
 	// > Inicializacao de variaveis
 	

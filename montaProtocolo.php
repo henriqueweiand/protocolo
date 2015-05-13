@@ -67,22 +67,24 @@
 	// < Percorre as partes da mensagem
 	foreach($a_m as $i => $a) {
 		
-		$tm = dechex(strlen($a));
+		$tm = dechex(strlen($a)); // Decimal para hexadecimal
 		$sq = dechex($i+1);
 		$or = $origem;
 		$de = $destino;
 		
+		// <
 		for($i=0; $i < 5; $i++) {
 			if(strlen($tm) < 3)	$tm = "0".$tm;
 			if(strlen($sq) < 5) $sq = "0".$sq;
 		}
+		// >
 
 		$z 	  = array_map("hexdec", array_reverse(str_split($tm.$sq, 2)));
 		$chk1 = ~($soh^$syn^$si^($or[0]^$or[1]^$or[2]^$or[3])^($de[0]^$de[1]^$de[2]^$de[3])^$so^($z[0]^$z[1]^$z[2]^$z[3])) & 0xff;
 		$msg  = array_map("ord", str_split($a));
-		$chk2 = $soh+$syn+$si+($or[0]+$or[1]+$or[2]+$or[3])+($de[0]+$de[1]+$de[2]+$de[3])+$so+($z[0]+$z[1]+$z[2]+$z[3])+$chk1+$stx+$eot+$etx;
+		$chk2 = $soh + $syn + $si + ($or[0] + $or[1] + $or[2] + $or[3]) + ($de[0] + $de[1] + $de[2] + $de[3]) + $so + ($z[0] + $z[1] + $z[2] + $z[3]) + $chk1 + $stx + $eot + $etx;
 		
-		foreach($msg as $b)	$chk2+= $b;
+		foreach($msg as $b)	$chk2 += $b;
 
 		$chk2 	   = array_map("hexdec", array_reverse(str_split(dechex((~$chk2) & 0xffff), 2)));
 		$protocolo = chr($soh).chr($syn).chr($si).implode("", array_map("chr", $or)).implode("", array_map("chr", $de)).chr($so).implode("", array_map("chr", $z)).chr($chk1).chr($stx).implode("", array_map("chr", $msg)).chr($etx).chr($eot).implode("", array_map("chr", $chk2));

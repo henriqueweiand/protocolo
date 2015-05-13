@@ -74,17 +74,16 @@
 
                                         <div class="form-group col-md-12">
                                             <?php 
-                                            $files = scandir('/home/ubuntu/workspace/arquivos');
+                                            $files = scandir('/home/ubuntu/workspace/arquivos'); // Arquivos da pasta
                                             unset($files[0]);
                                             unset($files[1]);
-                                            sort($files);
+                                            sort($files); // Reordena o array
                                             
                                             // < Verifica se já foi enviado arquivos
                                             if(!empty($files)) {
                                                 
                                                 // < Percorre os arquivos enviados
                                                 foreach($files as $file) {
-                                                    
                                                     list($data['grupo'], $data['nome'], $data['extensao']) = explode('.', $file);
                                                     
                                                     if($data['grupo'] != @$grupo) {
@@ -102,7 +101,6 @@
                                                     </a>';
                                                     
                                                     if($data['grupo'] != @$grupo) echo '</div>';
-                                                    
                                                 }
                                                 // < Percorre os arquivos enviados
                                                 
@@ -144,11 +142,9 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-    
     $('[data-toggle="tooltip"]').tooltip();
   
     $('[name=btnEnviar]').bind('click', function() {  
-        
         var origem   = $('[name=origem]').val(),
             destino  = $('[name=destino]').val(),
             mensagem = $('[name=mensagem]').val(),
