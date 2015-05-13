@@ -13,6 +13,9 @@
     "find.nak": {
         "@searchLimit": 100
     },
+    "general": {
+        "@stripws": false
+    },
     "language": {
         "@eslintrc": "true",
         "@instanceHighlight": "true",
@@ -26,6 +29,13 @@
         "configs": {
             "@inited": "true",
             "json()": {
+                "Apache & PHP": {
+                    "command": "",
+                    "debug": true,
+                    "default": true,
+                    "name": "Apache & PHP",
+                    "runner": "Apache httpd (PHP, HTML)"
+                },
                 "PHP": {
                     "command": "",
                     "default": true,
