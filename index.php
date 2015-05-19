@@ -19,6 +19,7 @@
 		<link type="image/x-icon" rel="shortcut icon" href="/favicon.ico" >
 
         <script src="framework/jquery-1.11.2.min.js"></script>
+        <script src="framework/index.js"></script>
         <script src="framework/bootstrap/js/bootstrap.min.js"></script>
 
         <link rel="stylesheet" href="framework/bootstrap/css/bootstrap.min.css">
@@ -28,7 +29,7 @@
     </head>
     <body>
 
-        <form name="formProtocolo" id="formProtocolo" method="GET" action="montaProtocolo.php" onsubmit="return false;">
+        <form data-ajax="true" progressbar=".progressbarFile" name="formProtocolo" id="formProtocolo" method="POST" action="montaProtocolo.php" onsubmit="return false;" enctype="multipart/form-data">
 
             <div class="container-fluid">
 
@@ -43,7 +44,7 @@
 
                         <div class="panel-body">
                             
-                            <div class="col-md-12 result"></div>
+                            <div class="col-md-12" id="result"></div>
                             
                             <div class="form-group col-md-6">
                                 <label for="">Endereço de origem</label>
@@ -57,8 +58,9 @@
 
                             <div role="tabpanel">
                                 <ul id="tabs" class="nav nav-tabs" role="tablist">
-                                    <li role="presentation" class="active"><a href="#mensagem" aria-controls="mensagem" role="tab" data-toggle="tab">Mensagem <small>(Enviar)</small></a></li>
-                                    <li role="presentation"><a href="#arquivo" aria-controls="arquivo" role="tab" data-toggle="tab">Arquivo <small>(Receber)</small></a></li>
+                                    <li role="presentation" class="active"><a href="#mensagem" aria-controls="mensagem" role="tab" data-toggle="tab">Enviar Mensagem</a></li>
+                                    <li role="presentation"><a href="#enviarArquivo" aria-controls="enviarArquivo" role="tab" data-toggle="tab">Enviar Arquivo</a></li>
+                                    <li role="presentation"><a href="#arquivo" aria-controls="arquivo" role="tab" data-toggle="tab">Processar Arquivo</a></li>
                                 </ul>
 
                                 <div class="tab-content">
@@ -70,11 +72,29 @@
                                         </div>
                                         
                                     </div>
+                                    
+                                    <div role="tabpanel" class="tab-pane" id="enviarArquivo">
+                                        <div class="form-group col-md-12">
+                                            
+                                            <div class="form-group col-md-12" style="padding-top:10px">
+                                                <label for="">Arquivo</label>
+                                                <input class="form-control" name="file" id="file" type="file" disabled />
+                                            </div>
+                                            
+                                            <div class="progressbarFile col-md-12">
+                                				<div class="progress" style="display:none;">
+                                					<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                                				</div>
+                                			</div>
+                                            
+                                        </div>
+                                    </div>
+                                    
                                     <div role="tabpanel" class="tab-pane" id="arquivo">
 
                                         <div class="form-group col-md-12">
                                             <?php 
-                                            $files = scandir('/home/ubuntu/workspace/arquivos'); // Arquivos da pasta
+                                            $files = scandir($_SERVER['DOCUMENT_ROOT']."/arquivos/"); // Arquivos da pasta
                                             unset($files[0]);
                                             unset($files[1]);
                                             sort($files); // Reordena o array
@@ -144,31 +164,42 @@
 jQuery(document).ready(function($) {
     $('[data-toggle="tooltip"]').tooltip();
   
-    $('[name=btnEnviar]').bind('click', function() {  
-        var origem   = $('[name=origem]').val(),
-            destino  = $('[name=destino]').val(),
-            mensagem = $('[name=mensagem]').val(),
-            action   = $('[name=formProtocolo]').attr('action');
+    $('[name=btnEnviar]').bind('click', function() {
+
+        var form = $('[name=formProtocolo]');
+
+        if(form.attr('progressbar')) {
+            send(form, { progressbar : form.attr('progressbar') });
+        } else {
+            send(form);
+        }
         
-        $.ajax({
-            url    : action
-            ,type  : 'GET'
-            ,data  : { 'origem' : origem, 'destino' : destino, 'mensagem' : mensagem }
-            ,success: function(data) { $('.result').html(data); }
-        });
     });
     
     $('#tabs a').click(function (e) {
         divID = $(this).attr("href");
         
-        if(divID == '#arquivo') {
-            $("#mensagem").find("textarea").prop("disabled", true);
-            $("[name=btnEnviar]").text("Receber arquivo");
-            $("[name=formProtocolo]").attr("action", "lerProtocolo.php");
-        } else {
-            $("#mensagem").find("textarea").prop("disabled", false);
-            $("[name=btnEnviar]").text("Enviar protocolo");
-            $("[name=formProtocolo]").attr("action", "montaProtocolo.php");
+        $("#mensagem, #enviarArquivo").find("textarea, input").prop("disabled", true);
+        
+        switch(divID) {
+            case '#arquivo':
+                $('#result').html("");
+                $("[name=btnEnviar]").text("Receber arquivo");
+                $("[name=formProtocolo]").attr("action", "lerProtocolo.php");
+            break;
+            
+            case '#mensagem':
+                $(divID).find("textarea").prop("disabled", false);
+                $("[name=btnEnviar]").text("Enviar protocolo");
+                $("[name=formProtocolo]").attr("action", "montaProtocolo.php");
+            break;
+            
+            case '#enviarArquivo':
+                $('#result').html("");
+                $(divID).find("input").prop("disabled", false);
+                $("[name=btnEnviar]").text("Enviar arquivo");
+                $("[name=formProtocolo]").attr("action", "montaProtocolo.php");
+            break;
         }
         
         e.preventDefault()

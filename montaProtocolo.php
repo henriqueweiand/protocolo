@@ -1,5 +1,13 @@
 <?php
-	$file = fopen("/home/ubuntu/workspace/arquivos/1.protocolo.txt", "wb");
+	/*
+	echo '<pre>';
+	print_r($_POST);
+	print_r($_FILES);
+	echo '</pre>';
+	exit();
+	*/
+	
+	$file = fopen($_SERVER['DOCUMENT_ROOT']."/arquivos/1.protocolo.txt", "wb");
 	// < Valores fixos
 	$soh  = hexdec("0x01");
 	$syn  = hexdec("0x16");
@@ -19,11 +27,16 @@
 	$chk2 = null;
 	// > Inicializacao de variaveis
 
-	// < Obtem valores $_GET
-	$origem  = isset($_GET["origem"])   ? $_GET["origem"]   : "";
-	$destino = isset($_GET["destino"])  ? $_GET["destino"]  : "";
-	$msg 	 = isset($_GET["mensagem"]) ? $_GET["mensagem"] : "";
-	// > Obtem valores $_GET
+	// < Obtem valores $_POST
+	$origem  = isset($_POST["origem"])   ? $_POST["origem"]   : "";
+	$destino = isset($_POST["destino"])  ? $_POST["destino"]  : "";
+	
+	if(!empty($_POST['mensagem'])) {
+		$msg = $_POST["mensagem"];
+	} else if(!empty($_POST['file'])) {
+		$msg = $_FILES["file"];
+	}
+	// > Obtem valores $_POST
 	
 	// < Check se existe mensagem
 	if(empty($msg)) {
@@ -79,8 +92,9 @@
 		}
 		// >
 
-		$z 	  = array_map("hexdec", array_reverse(str_split($tm.$sq, 2)));
-		$chk1 = ~($soh^$syn^$si^($or[0]^$or[1]^$or[2]^$or[3])^($de[0]^$de[1]^$de[2]^$de[3])^$so^($z[0]^$z[1]^$z[2]^$z[3])) & 0xff;
+		$z 	  = array_map("hexdec", array_reverse(str_split($tm.$sq, 2))); // tamanho e sequencia juntos
+		
+		$chk1 = ~($soh^$syn^$si^$or[0]^$or[1]^$or[2]^$or[3]^$de[0]^$de[1]^$de[2]^$de[3]^$so^$z[0]^$z[1]^$z[2]^$z[3]) & 0xff;
 		$msg  = array_map("ord", str_split($a));
 		$chk2 = $soh + $syn + $si + ($or[0] + $or[1] + $or[2] + $or[3]) + ($de[0] + $de[1] + $de[2] + $de[3]) + $so + ($z[0] + $z[1] + $z[2] + $z[3]) + $chk1 + $stx + $eot + $etx;
 		
