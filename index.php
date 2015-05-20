@@ -184,7 +184,7 @@ jQuery(document).ready(function($) {
             case '#arquivo':
                 $(divID).load('arquivos.php');
                 $('#result').html("");
-                $("[name=btnEnviar]").text("Receber Protocolo");
+                $("[name=btnEnviar]").text("Processar Protocolo");
                 $("[name=formProtocolo]").attr("action", "lerProtocolo.php");
             break;
             
