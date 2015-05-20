@@ -1,11 +1,39 @@
 <?php
-	/*
-	echo '<pre>';
-	print_r($_POST);
-	print_r($_FILES);
-	echo '</pre>';
-	exit();
-	*/
+
+	// < Obtem valores $_POST
+	$origem  = isset($_POST["origem"])   ? $_POST["origem"]   : "";
+	$destino = isset($_POST["destino"])  ? $_POST["destino"]  : "";
+
+	switch($_POST['tipoRequisicao']) {
+		case '#enviarProtocolo':
+			
+			@unlink($_SERVER['DOCUMENT_ROOT']."/arquivos/1.protocolo.txt");
+		
+			if(copy($_FILES['arquivoProtocolo']['tmp_name'], $_SERVER['DOCUMENT_ROOT']."/arquivos/1.protocolo.txt")) {
+				exit('
+				<div class="alert alert-success alert-dismissible" role="alert">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					Arquivo recebido com sucesso.
+				</div>');
+			} else {
+				exit('
+				<div class="alert alert-danger alert-dismissible" role="alert">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					ERRO - Houve um problema ao receber o arquivo, tente novamente.
+				</div>');
+			}
+			
+		break;
+		
+		case '#mensagem':
+			$msg = $_POST["mensagem"];
+		break;
+		
+		case '#enviarArquivo':
+			$msg = fopen($_FILES['file']['tmp_name'], 'rb');
+		break;
+	}
+	// > Obtem valores $_POST
 	
 	$file = fopen($_SERVER['DOCUMENT_ROOT']."/arquivos/1.protocolo.txt", "wb");
 	// < Valores fixos
@@ -26,17 +54,6 @@
 	$chk1 = null;
 	$chk2 = null;
 	// > Inicializacao de variaveis
-
-	// < Obtem valores $_POST
-	$origem  = isset($_POST["origem"])   ? $_POST["origem"]   : "";
-	$destino = isset($_POST["destino"])  ? $_POST["destino"]  : "";
-	
-	if(!empty($_POST['mensagem'])) {
-		$msg = $_POST["mensagem"];
-	} else if(!empty($_POST['file'])) {
-		$msg = $_FILES["file"];
-	}
-	// > Obtem valores $_POST
 	
 	// < Check se existe mensagem
 	if(empty($msg)) {
@@ -75,7 +92,7 @@
 	$origem  = array_reverse(explode(".",  $origem));
 	$destino = array_reverse(explode(".",  $destino));
 	// > Inverte os IP's
-	$a_m 	 = str_split($msg, 4096); // Permite apenas 4096 bytes da mensagem (Retorna array)
+	$a_m 	 = str_split($msg, 4095); // Permite apenas 4095 bytes da mensagem (Retorna array)
 	
 	// < Percorre as partes da mensagem
 	foreach($a_m as $i => $a) {

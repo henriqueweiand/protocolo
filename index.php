@@ -30,6 +30,8 @@
     <body>
 
         <form data-ajax="true" progressbar=".progressbarFile" name="formProtocolo" id="formProtocolo" method="POST" action="montaProtocolo.php" onsubmit="return false;" enctype="multipart/form-data">
+            
+            <input name="tipoRequisicao" type="hidden" value="#mensagem" />
 
             <div class="container-fluid">
 
@@ -58,10 +60,20 @@
 
                             <div role="tabpanel">
                                 <ul id="tabs" class="nav nav-tabs" role="tablist">
-                                    <li role="presentation" class="active"><a href="#mensagem" aria-controls="mensagem" role="tab" data-toggle="tab">Enviar Mensagem</a></li>
-                                    <li role="presentation"><a href="#enviarArquivo" aria-controls="enviarArquivo" role="tab" data-toggle="tab">Enviar Arquivo</a></li>
-                                    <li role="presentation"><a href="#arquivo" aria-controls="arquivo" role="tab" data-toggle="tab">Processar Arquivo</a></li>
+                                    <li role="presentation" class="active">
+                                        <a href="#mensagem" aria-controls="mensagem" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Enviar Mensagem</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#enviarArquivo" aria-controls="enviarArquivo" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-export" aria-hidden="true"></span> Enviar Arquivo</a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#enviarProtocolo" aria-controls="enviarProtocolo" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-open-file" aria-hidden="true"></span> Enviar Protocolo</a>
+                                    </li>
+                                    <li role="presentation" class="pull-right">
+                                        <a href="#arquivo" aria-controls="arquivo" role="tab" data-toggle="tab"><b><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Processar Protocolo</b></a>
+                                    </li>
                                 </ul>
+                                
 
                                 <div class="tab-content">
                                     <div role="tabpanel" class="tab-pane active" id="mensagem">
@@ -77,7 +89,7 @@
                                         <div class="form-group col-md-12">
                                             
                                             <div class="form-group col-md-12" style="padding-top:10px">
-                                                <label for="">Arquivo</label>
+                                                <label for="file">Arquivo</label>
                                                 <input class="form-control" name="file" id="file" type="file" disabled />
                                             </div>
                                             
@@ -90,48 +102,25 @@
                                         </div>
                                     </div>
                                     
-                                    <div role="tabpanel" class="tab-pane" id="arquivo">
-
+                                    <div role="tabpanel" class="tab-pane" id="enviarProtocolo">
                                         <div class="form-group col-md-12">
-                                            <?php 
-                                            $files = scandir($_SERVER['DOCUMENT_ROOT']."/arquivos/"); // Arquivos da pasta
-                                            unset($files[0]);
-                                            unset($files[1]);
-                                            sort($files); // Reordena o array
                                             
-                                            // < Verifica se já foi enviado arquivos
-                                            if(!empty($files)) {
-                                                
-                                                // < Percorre os arquivos enviados
-                                                foreach($files as $file) {
-                                                    list($data['grupo'], $data['nome'], $data['extensao']) = explode('.', $file);
-                                                    
-                                                    if($data['grupo'] != @$grupo) {
-                                                        $grupo = $data['grupo'];
-                                                        echo '
-                                                        <div class="list-group" style="margin-top:15px; margin-bottom:0px">
-                                                            <a class="list-group-item active">Arquivo da mensagem</a>
-                                                        ';
-                                                    }
-                                                    
-                                                    echo '
-                                                    <a class="list-group-item" target="_blank" href="/arquivos/'.$data['grupo'].'.'.$data['nome'].'.'.$data['extensao'].'">
-                                                        <span class="glyphicon glyphicon-download" aria-hidden="true" title="Baixar" data-toggle="tooltip" data-placement="top"></span>
-                                                        '.$data['nome'].'.'.$data['extensao'].'
-                                                    </a>';
-                                                    
-                                                    if($data['grupo'] != @$grupo) echo '</div>';
-                                                }
-                                                // < Percorre os arquivos enviados
-                                                
-                                            } else {
-                                                // Nao foi enviado nada ainda
-                                            }
-                                            // > Verifica se já foi enviado arquivos
-                                            ?>
+                                            <div class="form-group col-md-12" style="padding-top:10px">
+                                                <label for="arquivoProtocolo">Arquivo protocolo</label>
+                                                <input class="form-control" name="arquivoProtocolo" id="arquivoProtocolo" type="file" disabled />
+                                            </div>
+                                            
+                                            <div class="progressbarFile col-md-12">
+                                				<div class="progress" style="display:none;">
+                                					<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                                				</div>
+                                			</div>
                                             
                                         </div>
-
+                                    </div>
+                                    
+                                    <div role="tabpanel" class="tab-pane" id="arquivo">
+                                        <?php require_once('arquivos.php'); ?>
                                     </div>
                                 </div>
                             </div>
@@ -142,7 +131,7 @@
 
                         <div class="panel-footer text-right">
                             <a href="/Trabalho T3 - 20151.pdf" target="_blank"><button type="button" class="btn btn-default">Baixar Enunciado</button></a>
-                            <button type="button" class="btn btn-success" name="btnEnviar">Enviar protocolo</button>
+                            <button type="button" class="btn btn-success" name="btnEnviar">Enviar Mensagem</button>
                         </div>
                         <!-- END .panel-footer -->
 
@@ -179,28 +168,38 @@ jQuery(document).ready(function($) {
     $('#tabs a').click(function (e) {
         divID = $(this).attr("href");
         
-        $("#mensagem, #enviarArquivo").find("textarea, input").prop("disabled", true);
+        $("#mensagem, #enviarArquivo, #enviarProtocolo").find("textarea, input").prop("disabled", true);
         
         switch(divID) {
             case '#arquivo':
+                $(divID).load('arquivos.php');
                 $('#result').html("");
-                $("[name=btnEnviar]").text("Receber arquivo");
+                $("[name=btnEnviar]").text("Receber Protocolo");
                 $("[name=formProtocolo]").attr("action", "lerProtocolo.php");
             break;
             
             case '#mensagem':
                 $(divID).find("textarea").prop("disabled", false);
-                $("[name=btnEnviar]").text("Enviar protocolo");
+                $("[name=btnEnviar]").text("Enviar Mensagem");
                 $("[name=formProtocolo]").attr("action", "montaProtocolo.php");
             break;
             
             case '#enviarArquivo':
                 $('#result').html("");
                 $(divID).find("input").prop("disabled", false);
-                $("[name=btnEnviar]").text("Enviar arquivo");
+                $("[name=btnEnviar]").text("Enviar Arquivo");
+                $("[name=formProtocolo]").attr("action", "montaProtocolo.php");
+            break;
+            
+            case '#enviarProtocolo':
+                $('#result').html("");
+                $(divID).find("input").prop("disabled", false);
+                $("[name=btnEnviar]").text("Enviar Protocolo");
                 $("[name=formProtocolo]").attr("action", "montaProtocolo.php");
             break;
         }
+        
+        $("[name=tipoRequisicao]").val(divID);
         
         e.preventDefault()
         $(this).tab('show');
