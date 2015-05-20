@@ -1,14 +1,16 @@
 <?php
+	require_once('inc.php');
+
 	// < Inicializacao de variaveis
-	$filename = "/home/ubuntu/workspace/arquivos/1.protocolo.txt"; 		   // Arquivo do protocolo
+	$filename = FILE_PROTOCOL; 											   // Arquivo do protocolo
 	$file 	  = fopen($filename, "rb"); 						   		   // Abre para leitura
-	$fread 	  = str_split(fread ($file, filesize ($filename)), (4096+26)); // Pega os 4096 bytes (Mensage) + 26 bytes (Protocolo)  (retorna array)
+	$fread 	  = str_split(fread ($file, filesize ($filename)), (4095+22)); // Pega os 4096 bytes (Mensage) + 26 bytes (Protocolo)  (retorna array)
 	$msg 	  = "";
 	// > Inicializacao de variaveis
 	
 	// < Percorre os arquivos do protocolo
 	foreach($fread as $i => $f) {
-		
+
 		$i 		 	= $i+1;
 		$chr_header = substr($f, 0, 16); /* pega os 16 bytes do cabeçalho */
 		$chk_header = ord(substr($f, 16, 1)); /* pega o checksum do cabeçalho */
@@ -53,12 +55,31 @@
 		$msg.= substr($f, 18, -4);
 	}
 	
-	echo '
-	<div class="alert alert-success alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<b>MENSAGEM:</b> '.$msg.'
-	</div>
-	';
+	$tmp = fopen("tmp.txt", "wb");
+	
+	fwrite($tmp, $msg);
+	
+	if(@!$image = getimagesize("tmp.txt")) {
+	
+		echo '
+		<div class="alert alert-success alert-dismissible" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<b>MENSAGEM:</b> '.$msg.'
+		</div>
+		';
+	
+	} else {
+		echo '
+		<div class="col-md-12" style="margin-bottom:10px;">
+			<center>
+				<img src="'.('data:image/'.explode("/", $image["mime"])[1].';base64,'.base64_encode($msg)).'">
+			</center>
+		</div>
+		';
+	}
+	
+	fclose($tmp);
+	unlink("tmp.txt");
 
 	fclose($file);
 ?>

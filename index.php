@@ -88,7 +88,12 @@
                                     <div role="tabpanel" class="tab-pane" id="enviarArquivo">
                                         <div class="form-group col-md-12">
                                             
-                                            <div class="form-group col-md-12" style="padding-top:10px">
+                                            <div class="col-md-12 alert alert-info alert-dismissible" role="alert" style="margin-top:20px; margin-bottom:20px;">
+                                        		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        		Selecione um arquivo no formato .txt ou em fomarmato de imagem.
+                                        	</div>
+                                            
+                                            <div class="form-group col-md-12">
                                                 <label for="file">Arquivo</label>
                                                 <input class="form-control" name="file" id="file" type="file" disabled />
                                             </div>
@@ -105,7 +110,12 @@
                                     <div role="tabpanel" class="tab-pane" id="enviarProtocolo">
                                         <div class="form-group col-md-12">
                                             
-                                            <div class="form-group col-md-12" style="padding-top:10px">
+                                            <div class="col-md-12 alert alert-info alert-dismissible" role="alert" style="margin-top:20px; margin-bottom:20px;">
+                                        		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        		Envie um arquivo já no formato do protocolo conforme enunciado.
+                                        	</div>
+                                            
+                                            <div class="form-group col-md-12">
                                                 <label for="arquivoProtocolo">Arquivo protocolo</label>
                                                 <input class="form-control" name="arquivoProtocolo" id="arquivoProtocolo" type="file" disabled />
                                             </div>

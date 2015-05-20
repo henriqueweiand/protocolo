@@ -1,4 +1,12 @@
+<div class="col-md-12">
+    <div class=" alert alert-info alert-dismissible" role="alert" style="margin-top:20px; margin-bottom:5px;">
+    	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    	Nesta opção você ira processar o arquivo protocolo que já esta no servidor.
+    </div>
+</div>
+
 <div class="form-group col-md-12">
+	
     <?php 
     $files = scandir($_SERVER['DOCUMENT_ROOT']."/arquivos/"); // Arquivos da pasta
     unset($files[0]);

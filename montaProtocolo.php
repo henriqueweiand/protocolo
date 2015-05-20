@@ -1,5 +1,7 @@
 <?php
 
+	require_once('inc.php');
+
 	// < Obtem valores $_POST
 	$origem  = isset($_POST["origem"])   ? $_POST["origem"]   : "";
 	$destino = isset($_POST["destino"])  ? $_POST["destino"]  : "";
@@ -7,9 +9,9 @@
 	switch($_POST['tipoRequisicao']) {
 		case '#enviarProtocolo':
 			
-			@unlink($_SERVER['DOCUMENT_ROOT']."/arquivos/1.protocolo.txt");
+			@unlink(FILE_PROTOCOL);
 		
-			if(copy($_FILES['arquivoProtocolo']['tmp_name'], $_SERVER['DOCUMENT_ROOT']."/arquivos/1.protocolo.txt")) {
+			if(copy($_FILES['arquivoProtocolo']['tmp_name'], FILE_PROTOCOL)) {
 				exit('
 				<div class="alert alert-success alert-dismissible" role="alert">
 					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -30,12 +32,13 @@
 		break;
 		
 		case '#enviarArquivo':
-			$msg = fopen($_FILES['file']['tmp_name'], 'rb');
+			$msg = fread(fopen($_FILES['file']['tmp_name'], 'rb'), filesize($_FILES['file']['tmp_name']));
 		break;
 	}
+
 	// > Obtem valores $_POST
-	
-	$file = fopen($_SERVER['DOCUMENT_ROOT']."/arquivos/1.protocolo.txt", "wb");
+
+	$file = fopen(FILE_PROTOCOL, "wb");
 	// < Valores fixos
 	$soh  = hexdec("0x01");
 	$syn  = hexdec("0x16");
@@ -93,10 +96,10 @@
 	$destino = array_reverse(explode(".",  $destino));
 	// > Inverte os IP's
 	$a_m 	 = str_split($msg, 4095); // Permite apenas 4095 bytes da mensagem (Retorna array)
-	
+
 	// < Percorre as partes da mensagem
 	foreach($a_m as $i => $a) {
-		
+
 		$tm = dechex(strlen($a)); // Decimal para hexadecimal
 		$sq = dechex($i+1);
 		$or = $origem;
@@ -113,7 +116,7 @@
 		
 		$chk1 = ~($soh^$syn^$si^$or[0]^$or[1]^$or[2]^$or[3]^$de[0]^$de[1]^$de[2]^$de[3]^$so^$z[0]^$z[1]^$z[2]^$z[3]) & 0xff;
 		$msg  = array_map("ord", str_split($a));
-		$chk2 = $soh + $syn + $si + ($or[0] + $or[1] + $or[2] + $or[3]) + ($de[0] + $de[1] + $de[2] + $de[3]) + $so + ($z[0] + $z[1] + $z[2] + $z[3]) + $chk1 + $stx + $eot + $etx;
+		$chk2 = $soh + $syn + $si + $or[0] + $or[1] + $or[2] + $or[3] + $de[0] + $de[1] + $de[2] + $de[3] + $so + $z[0] + $z[1] + $z[2] + $z[3] + $chk1 + $stx + $eot + $etx;
 		
 		foreach($msg as $b)	$chk2 += $b;
 
@@ -123,6 +126,7 @@
 		fwrite($file, $protocolo); // Insere o conteudo no arquivo
 		
 		$protocolo = implode(" => ", array_map("dechex",array_map("ord", str_split($protocolo))));
+
 	}
 	// > Percorre as partes da mensagem
 
